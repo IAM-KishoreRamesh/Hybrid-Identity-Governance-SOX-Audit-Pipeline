@@ -81,7 +81,7 @@ while true; do
     sleep $(( ( RANDOM % 4 )  + 2 ))
 done
 ```
-![Linux Payload Execution](images/linux_payload_injection.png)
+🧾[Linux Payload Execution](https://github.com/IAM-KishoreRamesh/Hybrid-Identity-Governance-SOX-Audit-Pipeline/blob/main/Images/linux_payload_injection.png)
 
 ---
 
@@ -99,7 +99,7 @@ Syslog
 | extend Application = extract(@"\[TARGET_APP=([^\]]+)\]", 1, SyslogMessage)
 | project TimeGenerated, Event_Type, Target_User, Application
 ```
-![KQL Data Parsing](images/kql_data_parsing.png)
+🧾[KQL Data Parsing](https://github.com/IAM-KishoreRamesh/Hybrid-Identity-Governance-SOX-Audit-Pipeline/blob/main/Images/kql_data_parsing.png)
 
 ### The SOC Alerting Threshold
 Identifies potential brute-force or misconfigured service account behaviors. Triggers an alert if a single identity fails authentication multiple times within a rolling window.
@@ -109,7 +109,7 @@ Identifies potential brute-force or misconfigured service account behaviors. Tri
 | where FailureCount >= 2
 | order by TimeGenerated desc
 ```
-![SOC Alert Threshold](images/kql_alert_threshold.png)
+🧾[SOC Alert Threshold](https://github.com/IAM-KishoreRamesh/Hybrid-Identity-Governance-SOX-Audit-Pipeline/blob/main/Images/kql_alert_threshold.png)
 
 ---
 
