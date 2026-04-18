@@ -1,0 +1,14 @@
+Syslog
+| where SyslogMessage contains "OIM_AUDIT"
+// We only need to extract the fields relevant to an attack
+| extend Event_Type = extract(@"\[EVENT=([^\]]+)\]", 1, SyslogMessage)
+| extend Target_User = extract(@"\[USER=([^\]]+)\]", 1, SyslogMessage)
+| extend Application = extract(@"\[TARGET_APP=([^\]]+)\]", 1, SyslogMessage)
+| extend Failure_Reason = extract(@"\[REASON=([^\]]+)\]", 1, SyslogMessage)
+// Isolate only the authentication failures
+| where Event_Type == "AUTH_FAILURE"
+// Group the data: Count how many times a specific user failed on a specific app within a 3-minute rolling window
+| summarize FailureCount = count() by Target_User, Application, Failure_Reason, bin(TimeGenerated, 3m)
+// The Threshold: Only trigger the alert if they failed 2 or more times
+| where FailureCount >= 2
+| order by TimeGenerated desc

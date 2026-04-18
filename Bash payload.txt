@@ -1,0 +1,25 @@
+#!/bin/bash
+echo "Initializing Identity Governance Simulation..."
+echo "Injecting events into syslog. Press [Ctrl+C] to terminate."
+echo "------------------------------------------------------"
+USERS=("kramesh" "psrinivas" "jdoe" "asmith" "svc_ebs_admin")
+ROLES=("App_Owner_OIM" "SOX_Auditor" "DBA_EBS" "Helpdesk_Tier1")
+APPS=("OIM_12c" "Oracle_EBS_R12" "Azure_AD")
+while true; do
+    RAND_USER=${USERS[$RANDOM % ${#USERS[@]}]}
+    RAND_ROLE=${ROLES[$RANDOM % ${#ROLES[@]}]}
+    RAND_APP=${APPS[$RANDOM % ${#APPS[@]}]}
+    
+    EVENT_TYPE=$(($RANDOM % 4))
+case $EVENT_TYPE in
+        0) MSG="OIM_AUDIT: [EVENT=PROVISIONING] [STATUS=SUCCESS] [USER=$RAND_USER] [TARGET_APP=$RAND_APP] [ACTION=Create_Account] [INITIATOR=System_Reconciliation]" ;;
+        1) MSG="OIM_AUDIT: [EVENT=ENTITLEMENT] [STATUS=SUCCESS] [USER=$RAND_USER] [TARGET_APP=$RAND_APP] [ACTION=Grant_Role] [ROLE=$RAND_ROLE] [INITIATOR=Access_Manager]" ;;
+        2) MSG="OIM_AUDIT: [EVENT=REVOCATION] [STATUS=SUCCESS] [USER=$RAND_USER] [TARGET_APP=$RAND_APP] [ACTION=Disable_Account] [REASON=Termination] [INITIATOR=HR_System]" ;;
+        3) MSG="OIM_AUDIT: [EVENT=AUTH_FAILURE] [STATUS=FAILED] [USER=$RAND_USER] [TARGET_APP=$RAND_APP] [ACTION=Login_Attempt] [REASON=Invalid_Credentials] [SEVERITY=HIGH]" ;;
+    esac
+# Injects the structured string into the OS background daemon
+    logger -p syslog.info -t OIM_GOVERNANCE "$MSG"
+    
+    echo "Injected -> $MSG"
+    sleep $(( ( RANDOM % 4 )  + 2 ))
+done
